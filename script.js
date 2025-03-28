@@ -17,14 +17,14 @@ let xTurn = true;
 let count = 0;
 
 const disableButtons = () => {
-  btnRef.forEach((element) => (element.disabled = true));
+  btnRef.forEach((button) => (button.disabled = true));
   popupRef.classList.remove("hide");
 };
 
 const enableButtons = () => {
-  btnRef.forEach((element) => {
-    element.innerText = "";
-    element.disabled = false;
+  btnRef.forEach((button) => {
+    button.innerText = "";
+    button.disabled = false;
   });
   popupRef.classList.add("hide");
 };
@@ -34,47 +34,53 @@ const drawFunction = () => {
   msgRef.innerHTML = "&#x1F60E; <br> It's a Draw";
 };
 
-newgameBtn.addEventListener("click", () => {
-  count = 0;
-  enableButtons();
-});
-restartBtn.addEventListener("click", () => {
-  count = 0;
-  enableButtons();
-});
+const winFunction = (player) => {
+  disableButtons();
+  msgRef.innerHTML = `${player === 'X' ? 'X' : 'O'} Wins! &#x1F60D;`;
+};
 
 const winChecker = () => {
-  for (let i of winningPattern) {
-    let [element1, element2, element3] = [
-      btnRef[i[0]].innerText,
-      btnRef[i[1]].innerText,
-      btnRef[i[2]].innerText
+  for (let pattern of winningPattern) {
+    let [a, b, c] = [
+      btnRef[pattern[0]].innerText,
+      btnRef[pattern[1]].innerText,
+      btnRef[pattern[2]].innerText
     ];
-    if (element1 !== "" && element2 !== "" && element3 !== "") {
-      if (element1 === element2 && element2 === element3) {
-        winFunction(element1); // Certifique-se de definir essa função
-      }
+    if (a && b && c && a === b && b === c) {
+      winFunction(a);
+      return;
     }
   }
 };
 
-btnRef.forEach((element) => {
-  element.addEventListener("click", () => {
+btnRef.forEach((button) => {
+  button.addEventListener("click", () => {
     if (xTurn) {
       xTurn = false;
-      element.innerText = "X";
-      element.disabled = true;
+      button.innerText = "X";
     } else {
       xTurn = true;
-      element.innerText = "O";
-      element.disabled = true;
+      button.innerText = "O";
     }
-    count += 1;
+    button.disabled = true;
+    count++;
+    
     if (count === 9) {
       drawFunction();
+    } else {
+      winChecker();
     }
-    winChecker();
   });
+});
+
+newgameBtn.addEventListener("click", () => {
+  count = 0;
+  enableButtons();
+});
+
+restartBtn.addEventListener("click", () => {
+  count = 0;
+  enableButtons();
 });
 
 window.onload = enableButtons;
